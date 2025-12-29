@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Salarial Brasil 2025</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: none; }
+        .header-bg { background: linear-gradient(135deg, #0d6efd, #0a58ca); color: white; padding: 2rem 0; margin-bottom: 2rem; }
+        .result-box { background-color: #e9ecef; border-radius: 10px; padding: 20px; text-align: center; display: none; margin-top: 20px;}
+        .result-value { font-size: 2.5rem; font-weight: bold; color: #198754; }
+        .spinner-border { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="header-bg text-center">
+    <h1>💰 Simulador de Salários Brasil</h1>
+    <p class="lead">Baseado em dados da PNADc 2025 (IBGE) e Microeconometria</p>
+</div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card p-4">
+                <form id="salaryForm">
+                    <h4 class="mb-3 text-muted">Seu Perfil</h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Idade</label>
+                            <input type="number" class="form-control" id="idade" value="30" min="14" max="80" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Anos de Estudo</label>
+                            <select class="form-select" id="estudo">
+                                <option value="0">Sem instrução (0 anos)</option>
+                                <option value="4">Fundamental Incompleto (4 anos)</option>
+                                <option value="9">Fundamental Completo (9 anos)</option>
+                                <option value="12" selected>Médio Completo (12 anos)</option>
+                                <option value="16">Superior Completo (16 anos)</option>
+                                <option value="18">Mestrado/Doutorado (+18 anos)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Gênero</label>
+                            <select class="form-select" id="sexo">
+                                <option value="homem">Homem</option>
+                                <option value="mulher">Mulher</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Cor / Raça</label>
+                            <select class="form-select" id="cor">
+                                <option value="branca">Branca / Amarela</option>
+                                <option value="preta">Preta / Parda</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h4 class="mb-3 text-muted">Trabalho e Localização</h4>
+
+                    <div class="mb-3">
+                        <label class="form-label">Setor de Atividade</label>
+                        <select class="form-select" id="setor">
+                            <option value="1">Agricultura, pecuária, silvicultura (Base)</option>
+                            <option value="2">Indústria geral</option>
+                            <option value="3">Indústria de transformação</option>
+                            <option value="4">Eletricidade e gás</option>
+                            <option value="5">Água, esgoto e gestão de resíduos</option>
+                            <option value="6">Construção</option>
+                            <option value="7">Comércio, reparação de veículos</option>
+                            <option value="8">Transporte, armazenagem e correio</option>
+                            <option value="9">Alojamento e alimentação</option>
+                            <option value="10">Informação e comunicação</option>
+                            <option value="11">Administração pública, defesa e seguridade</option>
+                            <option value="12">Outros Serviços (Educação, Saúde, etc)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Estado (UF)</label>
+                        <select class="form-select" id="uf">
+                            <option value="11">Rondônia (RO)</option>
+                            <option value="12">Acre (AC)</option>
+                            <option value="13">Amazonas (AM)</option>
+                            <option value="14">Roraima (RR)</option>
+                            <option value="15">Pará (PA)</option>
+                            <option value="16">Amapá (AP)</option>
+                            <option value="17">Tocantins (TO)</option>
+                            <option value="21">Maranhão (MA)</option>
+                            <option value="22">Piauí (PI)</option>
+                            <option value="23">Ceará (CE)</option>
+                            <option value="24">Rio Grande do Norte (RN)</option>
+                            <option value="25">Paraíba (PB)</option>
+                            <option value="26">Pernambuco (PE)</option>
+                            <option value="27">Alagoas (AL)</option>
+                            <option value="28">Sergipe (SE)</option>
+                            <option value="29">Bahia (BA)</option>
+                            <option value="31">Minas Gerais (MG)</option>
+                            <option value="32">Espírito Santo (ES)</option>
+                            <option value="33">Rio de Janeiro (RJ)</option>
+                            <option value="35" selected>São Paulo (SP)</option>
+                            <option value="41">Paraná (PR)</option>
+                            <option value="42">Santa Catarina (SC)</option>
+                            <option value="43">Rio Grande do Sul (RS)</option>
+                            <option value="50">Mato Grosso do Sul (MS)</option>
+                            <option value="51">Mato Grosso (MT)</option>
+                            <option value="52">Goiás (GO)</option>
+                            <option value="53">Distrito Federal (DF)</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="calcularSalario()">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Calcular Estimativa
+                        </button>
+                    </div>
+                </form>
+
+                <div id="resultado" class="result-box">
+                    <h5>Média Salarial Estimada:</h5>
+                    <div class="result-value" id="valorEstimado">R$ 0,00</div>
+                    <small class="text-muted">Valor mensal bruto estimado (40h semanais).</small>
+                    <div id="comparativo-uf" class="mt-3 text-start small text-secondary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let coeficientes = null;
+
+    // Carrega o JSON assim que a página abre
+    fetch('modelo.json')
+        .then(response => response.json())
+        .then(data => {
+            coeficientes = data.coeficientes;
+            console.log("Modelo carregado!", data.meta_info);
+        })
+        .catch(error => {
+            console.error('Erro ao carregar modelo:', error);
+            alert('Erro: Não foi possível carregar o arquivo modelo.json');
+        });
+
+    function calcularSalario() {
+        if (!coeficientes) {
+            alert("Aguarde, carregando modelo...");
+            return;
+        }
+
+        // 1. Coleta Inputs
+        const idade = parseFloat(document.getElementById('idade').value);
+        const anosEstudo = parseFloat(document.getElementById('estudo').value);
+        const sexo = document.getElementById('sexo').value; // 'homem' ou 'mulher'
+        const cor = document.getElementById('cor').value;   // 'branca' ou 'preta'
+        const setor = document.getElementById('setor').value;
+        const uf = document.getElementById('uf').value;
+
+        // 2. Cálculo da Experiência
+        let experiencia = idade - anosEstudo - 6;
+        if (experiencia < 0) experiencia = 0;
+        let experiencia2 = experiencia * experiencia;
+
+        // 3. Soma dos Coeficientes (Log-Linear)
+        // Começa com a Constante (Intercepto)
+        // O JSON pode ter salvo como 'Intercepto' ou 'const'. O código Python ajustou para 'const' ou removeu.
+        // Vamos tentar pegar o valor base.
+        let score = coeficientes['const'] || coeficientes['Intercepto'] || 1.2950; 
+
+        // Variáveis Contínuas
+        score += (coeficientes['Anos_Estudo'] || 0) * anosEstudo;
+        score += (coeficientes['Experiencia'] || 0) * experiencia;
+        score += (coeficientes['Experiencia_2'] || 0) * experiencia2;
+
+        // Dummies Simples
+        if (sexo === 'mulher') score += (coeficientes['d_mulher'] || 0);
+        if (cor === 'preta') score += (coeficientes['d_preto_pardo'] || 0);
+
+        // Dummy de UF
+        // Se for UF 11 (RO), não tem chave no JSON (é base = 0)
+        let chaveUF = `UF_${uf}`;
+        if (coeficientes[chaveUF]) {
+            score += coeficientes[chaveUF];
+        }
+
+        // Dummy de Setor
+        // Se for Setor 1, não tem chave (é base = 0)
+        let chaveSetor = `setor_${setor}`;
+        if (coeficientes[chaveSetor]) {
+            score += coeficientes[chaveSetor];
+        }
+
+        // IMR (Correção de Seleção)
+        // Como é um simulador, usamos um valor médio fixo de IMR para não subestimar
+        // Assumindo IMR médio de 0.6 para população ocupada
+        if (coeficientes['IMR']) {
+            score += coeficientes['IMR'] * 0.6;
+        }
+
+        // 4. Transformação Final
+        // O modelo prevê log(salario_hora).
+        // Salario Mensal = exp(score) * 4.5 semanas * 40 horas
+        let salarioHora = Math.exp(score);
+        let salarioMensal = salarioHora * 4.5 * 40; // Baseado em jornada padrão
+
+        // 5. Exibir Resultado
+        document.querySelector('.result-box').style.display = 'block';
+        
+        // Formatação em Reais
+        let valorFormatado = salarioMensal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('valorEstimado').innerText = valorFormatado;
+        
+        // Efeito visual de scroll
+        document.getElementById('resultado').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
