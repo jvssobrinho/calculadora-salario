@@ -265,7 +265,7 @@
 
     <script>
         let modelo = null;
-        let myChart = null; // Variável global para o gráfico
+        let myChart = null; 
 
         // Carregamento do JSON
         fetch('modelo_salario_coeficientes_2025_geral.json') 
@@ -283,7 +283,7 @@
             });
 
         // ---------------------------------------------------------
-        // FUNÇÃO 1: CALCULADORA INSTANTÂNEA (Lógica Original)
+        // FUNÇÃO 1: CALCULADORA INSTANTÂNEA
         // ---------------------------------------------------------
         function calcularSalario() {
             if (!modelo) { alert("Carregando modelo..."); return; }
@@ -336,28 +336,27 @@
         }
 
         // ---------------------------------------------------------
-        // FUNÇÃO 2: SIMULAÇÃO DE VIDA (Lógica Python portada)
+        // FUNÇÃO 2: SIMULAÇÃO DE VIDA 
         // ---------------------------------------------------------
         function simularVida() {
             if (!modelo) { alert("Aguarde o carregamento do modelo."); return; }
 
-            // 1. Coleta Inputs da Aba Simulação
             const inflacao = parseFloat(document.getElementById('sim_inflacao').value) / 100;
             const uf = document.getElementById('sim_uf').value;
             const setor = document.getElementById('sim_setor').value;
             const coef = modelo.coeficientes;
 
-            // Perfis fixos para comparação (como no seu Python)
+            // Cores das Linhas
             const perfis = [
-                { label: "Médio Completo", anos: 12, inicio: 18, color: '#440154', data: [] },
-                { label: "Superior Completo", anos: 16, inicio: 23, color: '#21918c', data: [] },
-                { label: "Mestrado/Doutorado", anos: 18, inicio: 30, color: '#5ec962', data: [] }
+                { label: "Médio Completo", anos: 12, inicio: 18, color: '#440154', data: [] },      // Roxo
+                { label: "Superior Completo", anos: 16, inicio: 23, color: '#21918c', data: [] },   // Azul Petróleo
+                { label: "Mestrado/Doutorado", anos: 18, inicio: 30, color: '#5ec962', data: [] }   // Verde
             ];
 
             const labelsIdade = [];
             const salariosPorAno = 13;
             
-            // 2. Loop de Simulação (18 a 65 anos)
+            // Loop Simulação
             for (let idade = 18; idade <= 65; idade++) {
                 labelsIdade.push(idade);
 
@@ -365,71 +364,76 @@
                     let acumuladoAnterior = perfil.data.length > 0 ? perfil.data[perfil.data.length - 1] : 0;
                     
                     if (idade < perfil.inicio) {
-                        perfil.data.push(acumuladoAnterior); // Ainda não ganha, mantém acumulado (custo oportunidade)
+                        perfil.data.push(acumuladoAnterior); 
                     } else {
-                        // Calcula Experiência Minceriana
                         let exp = Math.max(0, idade - perfil.anos - 6);
                         let exp2 = exp * exp;
 
-                        // Score Log-Linear Base
                         let score = (coef['const'] || 0) +
                                     (coef['Anos_Estudo'] || 0) * perfil.anos +
                                     (coef['Experiencia'] || 0) * exp +
                                     (coef['Experiencia_2'] || 0) * exp2;
 
-                        // Controles fixos (Homem, Branco como base no exemplo Python, mas adicionando UF/Setor)
                         if (coef[`UF_${uf}`]) score += coef[`UF_${uf}`];
                         if (coef[`setor_${setor}`]) score += coef[`setor_${setor}`];
                         if (coef['IMR']) score += coef['IMR'] * 0.6;
 
-                        // Salário Real Mensal
                         let salarioReal = Math.exp(score) * 180;
-
-                        // Aplica Inflação Composta (desde os 18 anos)
                         let anosInflacao = idade - 18;
                         let fatorInflacao = Math.pow(1 + inflacao, anosInflacao);
                         let salarioNominal = salarioReal * fatorInflacao;
 
-                        // Acumula
                         let rendaAnual = salarioNominal * salariosPorAno;
                         perfil.data.push(acumuladoAnterior + rendaAnual);
                     }
                 });
             }
 
-            // 3. Detecção de "Crossover" (Pontos de Virada)
+            // --- LÓGICA DE PONTOS DE VIRADA ---
             const insightsContainer = document.getElementById('simulation-insights');
             insightsContainer.innerHTML = '';
-            const points = []; // Para desenhar no gráfico
+            const points = []; 
 
+            // Definição das comparações e CORES dos pontos
             const comparacoes = [
-                { maior: perfis[1], menor: perfis[0] }, // Superior > Médio
-                { maior: perfis[2], menor: perfis[1] }  // Mestrado > Superior
+                { 
+                    maior: perfis[1], 
+                    menor: perfis[0], 
+                    titulo: "Superior passa Médio",
+                    corPonto: '#ff7f0e' // Laranja
+                }, 
+                { 
+                    maior: perfis[2], 
+                    menor: perfis[1],
+                    titulo: "Mestrado passa Superior",
+                    corPonto: '#d62728' // Vermelho
+                } 
             ];
 
             comparacoes.forEach(comp => {
-                // Encontra a primeira idade onde a curva maior ultrapassa a menor
-                // Ignora os primeiros anos onde ambos podem ser zero ou custos iniciais
                 for (let i = 0; i < labelsIdade.length; i++) {
-                    // Só verifica se a idade for maior que o inicio da carreira do "maior"
                     if (labelsIdade[i] > comp.maior.inicio && comp.maior.data[i] > comp.menor.data[i]) {
                         
-                        // Cria anotação visual e texto
                         let idadeVirada = labelsIdade[i];
                         let valorVirada = comp.maior.data[i];
 
-                        // Adiciona HTML
+                        // Card HTML
                         let html = `
-                            <div class="analysis-card shadow-sm">
-                                <strong>✅ ${comp.maior.label} ultrapassa ${comp.menor.label}</strong><br>
-                                Idade de virada: <span class="text-primary fw-bold">${idadeVirada} anos</span><br>
-                                Patrimônio Acumulado: R$ ${(valorVirada/1000000).toFixed(2)} Milhões
+                            <div class="analysis-card shadow-sm" style="border-left-color: ${comp.corPonto}">
+                                <strong style="color: ${comp.corPonto}">● ${comp.titulo}</strong><br>
+                                Idade: <b>${idadeVirada} anos</b><br>
+                                Acumulado: R$ ${(valorVirada/1000000).toFixed(2)} Milhões
                             </div>`;
                         insightsContainer.innerHTML += html;
 
-                        // Adiciona ponto para o gráfico
-                        points.push({ x: idadeVirada, y: valorVirada, label: `${comp.maior.label} >` });
-                        break; // Para após encontrar o primeiro ponto
+                        // Adiciona configuração específica do ponto
+                        points.push({ 
+                            x: idadeVirada, 
+                            y: valorVirada, 
+                            labelLegend: comp.titulo, // Texto que vai pra legenda
+                            color: comp.corPonto
+                        });
+                        break; 
                     }
                 }
             });
@@ -438,36 +442,38 @@
         }
 
         // ---------------------------------------------------------
-        // FUNÇÃO 3: RENDERIZAR GRÁFICO (Chart.js)
+        // FUNÇÃO 3: RENDERIZAR GRÁFICO (Chart.js) - ATUALIZADA
         // ---------------------------------------------------------
         function renderizarGrafico(labels, datasets, points) {
             const ctx = document.getElementById('lifeChart').getContext('2d');
 
             if (myChart) myChart.destroy();
 
-            // Dataset das linhas
+            // 1. Dataset das Linhas (Curvas)
             const chartDatasets = datasets.map(d => ({
                 label: d.label,
                 data: d.data,
                 borderColor: d.color,
                 backgroundColor: d.color,
                 borderWidth: 3,
-                pointRadius: 0, // Linha limpa
-                tension: 0.4 // Curva suave
+                pointRadius: 0,
+                tension: 0.4
             }));
 
-            // Dataset dos pontos de virada (Scatter)
-            const scatterData = points.map(p => ({ x: p.x, y: p.y }));
-            if (scatterData.length > 0) {
+            // 2. Dataset dos Pontos (Cria um dataset separado para cada ponto para aparecer na legenda)
+            points.forEach(p => {
                 chartDatasets.push({
-                    label: 'Ponto de Virada',
-                    data: scatterData,
+                    label: p.labelLegend, // Ex: "Superior passa Médio"
+                    data: [{x: p.x, y: p.y}],
                     type: 'scatter',
-                    backgroundColor: 'red',
-                    pointRadius: 6,
-                    pointHoverRadius: 8
+                    backgroundColor: p.color, // Cor específica (Laranja ou Vermelho)
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    order: 0 // Garante que o ponto fique por cima da linha
                 });
-            }
+            });
 
             myChart = new Chart(ctx, {
                 type: 'line',
@@ -479,8 +485,9 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: {
-                        mode: 'index',
-                        intersect: false,
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     },
                     plugins: {
                         title: { display: true, text: 'Acumulado de Renda Vitalícia (Nominal)', font: { size: 16 } },
@@ -490,7 +497,10 @@
                                     let label = context.dataset.label || '';
                                     if (label) label += ': ';
                                     if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                        // Formata tooltip em Milhões ou Milhares
+                                        let val = context.parsed.y;
+                                        if (val >= 1e6) return label + 'R$ ' + (val/1e6).toFixed(2) + ' Mi';
+                                        return label + 'R$ ' + (val/1e3).toFixed(0) + ' k';
                                     }
                                     return label;
                                 }
@@ -507,8 +517,7 @@
                             ticks: {
                                 callback: function(value) {
                                     if (value >= 1000000) return 'R$ ' + (value/1000000).toFixed(1) + ' Mi';
-                                    if (value >= 1000) return 'R$ ' + (value/1000).toFixed(0) + ' k';
-                                    return value;
+                                    return 'R$ ' + (value/1000).toFixed(0) + ' k';
                                 }
                             }
                         }
@@ -519,5 +528,6 @@
     </script>
 </body>
 </html>
+
 
 
