@@ -192,68 +192,77 @@
     Descubra o "ponto de virada": com que idade o salário maior de quem estudou compensa os anos que a pessoa passou sem trabalhar?
 </p>
                             
-                            <div class="row g-3 p-3 bg-light rounded mb-4 border">
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold small">Inflação Anual (%)</label>
-                                    <input type="number" id="sim_inflacao" class="form-control" value="6.0" step="0.1">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold small">UF</label>
-                                  <select class="form-select" id="sim_uf">
-    <option value="11">Rondônia (RO)</option>
-    <option value="12">Acre (AC)</option>
-    <option value="13">Amazonas (AM)</option>
-    <option value="14">Roraima (RR)</option>
-    <option value="15">Pará (PA)</option>
-    <option value="16">Amapá (AP)</option>
-    <option value="17">Tocantins (TO)</option>
+                           <div class="row g-3 p-3 bg-light rounded mb-4 border">
+    <div class="col-md-3">
+        <label class="form-label fw-bold small">Inflação Anual (%)</label>
+        <input type="number" id="sim_inflacao" class="form-control" value="6.0" step="0.1">
+    </div>
     
-    <option value="21">Maranhão (MA)</option>
-    <option value="22">Piauí (PI)</option>
-    <option value="23">Ceará (CE)</option>
-    <option value="24">Rio Grande do Norte (RN)</option>
-    <option value="25">Paraíba (PB)</option>
-    <option value="26">Pernambuco (PE)</option>
-    <option value="27">Alagoas (AL)</option>
-    <option value="28">Sergipe (SE)</option>
-    <option value="29">Bahia (BA)</option>
-    
-    <option value="31">Minas Gerais (MG)</option>
-    <option value="32">Espírito Santo (ES)</option>
-    <option value="33">Rio de Janeiro (RJ)</option>
-    <option value="35" selected>São Paulo (SP)</option>
-    
-    <option value="41">Paraná (PR)</option>
-    <option value="42">Santa Catarina (SC)</option>
-    <option value="43">Rio Grande do Sul (RS)</option>
-    
-    <option value="50">Mato Grosso do Sul (MS)</option>
-    <option value="51">Mato Grosso (MT)</option>
-    <option value="52">Goiás (GO)</option>
-    <option value="53">Distrito Federal (DF)</option>
-</select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold small">Setor</label>
-                                    <select class="form-select" id="sim_setor">
-<option value="1">Agricultura e Pecuária</option>
-    <option value="2">Indústria Extrativa</option>
-    <option value="3">Indústria de Transformação</option>
-    <option value="4">Eletricidade e Gás</option>
-    <option value="5">Água e Esgoto</option>
-    <option value="6" selected>Construção Civil</option>
-    <option value="7">Comércio</option>
-    <option value="8">Transportes e Correio</option>
-    <option value="9">Alojamento e Alimentação</option>
-    <option value="10">TI e Comunicação</option>
-    <option value="11">Adm. Pública</option>
-    <option value="12">Educação e Saúde</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <button class="btn btn-success w-100 fw-bold" onclick="simularVida()">Gerar Gráfico</button>
-                                </div>
-                            </div>
+    <div class="col-md-3">
+        <label class="form-label fw-bold small">Cor / Raça</label>
+        <select class="form-select" id="sim_cor">
+            <option value="branca" selected>Branca / Amarela</option>
+            <option value="preta">Preta / Parda</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label fw-bold small">UF</label>
+        <select class="form-select" id="sim_uf">
+            <option value="11">Rondônia (RO)</option>
+            <option value="12">Acre (AC)</option>
+            <option value="13">Amazonas (AM)</option>
+            <option value="14">Roraima (RR)</option>
+            <option value="15">Pará (PA)</option>
+            <option value="16">Amapá (AP)</option>
+            <option value="17">Tocantins (TO)</option>
+            <option value="21">Maranhão (MA)</option>
+            <option value="22">Piauí (PI)</option>
+            <option value="23">Ceará (CE)</option>
+            <option value="24">Rio Grande do Norte (RN)</option>
+            <option value="25">Paraíba (PB)</option>
+            <option value="26">Pernambuco (PE)</option>
+            <option value="27">Alagoas (AL)</option>
+            <option value="28">Sergipe (SE)</option>
+            <option value="29">Bahia (BA)</option>
+            <option value="31">Minas Gerais (MG)</option>
+            <option value="32">Espírito Santo (ES)</option>
+            <option value="33">Rio de Janeiro (RJ)</option>
+            <option value="35" selected>São Paulo (SP)</option>
+            <option value="41">Paraná (PR)</option>
+            <option value="42">Santa Catarina (SC)</option>
+            <option value="43">Rio Grande do Sul (RS)</option>
+            <option value="50">Mato Grosso do Sul (MS)</option>
+            <option value="51">Mato Grosso (MT)</option>
+            <option value="52">Goiás (GO)</option>
+            <option value="53">Distrito Federal (DF)</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label fw-bold small">Setor</label>
+        <select class="form-select" id="sim_setor">
+            <option value="1">Agricultura e Pecuária</option>
+            <option value="2">Indústria Extrativa</option>
+            <option value="3">Indústria de Transformação</option>
+            <option value="4">Eletricidade e Gás</option>
+            <option value="5">Água e Esgoto</option>
+            <option value="6" selected>Construção Civil</option>
+            <option value="7">Comércio</option>
+            <option value="8">Transportes e Correio</option>
+            <option value="9">Alojamento e Alimentação</option>
+            <option value="10">TI e Comunicação</option>
+            <option value="11">Adm. Pública</option>
+            <option value="12">Educação e Saúde</option>
+        </select>
+    </div>
+
+    <div class="col-12 mt-3">
+        <button class="btn btn-success w-100 fw-bold shadow-sm" onclick="simularVida()">
+            🔄 Atualizar Gráfico
+        </button>
+    </div>
+</div>
 
                             <div id="chart-container">
                                 <canvas id="lifeChart"></canvas>
@@ -350,23 +359,24 @@
             resultBox.style.display = 'block';
             resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-
         // ---------------------------------------------------------
-        // FUNÇÃO 2: SIMULAÇÃO DE VIDA 
+        // FUNÇÃO 2: SIMULAÇÃO DE VIDA (Atualizada com Raça)
         // ---------------------------------------------------------
         function simularVida() {
             if (!modelo) { alert("Aguarde o carregamento do modelo."); return; }
 
+            // 1. Coleta Inputs (Incluindo a nova Raça)
             const inflacao = parseFloat(document.getElementById('sim_inflacao').value) / 100;
             const uf = document.getElementById('sim_uf').value;
             const setor = document.getElementById('sim_setor').value;
+            const cor = document.getElementById('sim_cor').value; // <--- NOVO
             const coef = modelo.coeficientes;
 
             // Cores das Linhas
             const perfis = [
-                { label: "Médio Completo", anos: 12, inicio: 18, color: '#440154', data: [] },      // Roxo
-                { label: "Superior Completo", anos: 16, inicio: 23, color: '#21918c', data: [] },   // Azul Petróleo
-                { label: "Mestrado/Doutorado", anos: 18, inicio: 30, color: '#5ec962', data: [] }   // Verde
+                { label: "Médio Completo", anos: 12, inicio: 18, color: '#440154', data: [] },
+                { label: "Superior Completo", anos: 16, inicio: 23, color: '#21918c', data: [] },
+                { label: "Mestrado/Doutorado", anos: 18, inicio: 30, color: '#5ec962', data: [] }
             ];
 
             const labelsIdade = [];
@@ -385,15 +395,24 @@
                         let exp = Math.max(0, idade - perfil.anos - 6);
                         let exp2 = exp * exp;
 
+                        // Score Base
                         let score = (coef['const'] || 0) +
                                     (coef['Anos_Estudo'] || 0) * perfil.anos +
                                     (coef['Experiencia'] || 0) * exp +
                                     (coef['Experiencia_2'] || 0) * exp2;
 
+                        // Controles Fixos e Variáveis
                         if (coef[`UF_${uf}`]) score += coef[`UF_${uf}`];
                         if (coef[`setor_${setor}`]) score += coef[`setor_${setor}`];
+                        
+                        // --- APLICAÇÃO DO COEFICIENTE DE RAÇA ---
+                        if (cor === 'preta') {
+                            score += (coef['d_preto_pardo'] || 0);
+                        }
+
                         if (coef['IMR']) score += coef['IMR'] * 0.6;
 
+                        // Cálculo Financeiro
                         let salarioReal = Math.exp(score) * 180;
                         let anosInflacao = idade - 18;
                         let fatorInflacao = Math.pow(1 + inflacao, anosInflacao);
@@ -410,19 +429,18 @@
             insightsContainer.innerHTML = '';
             const points = []; 
 
-            // Definição das comparações e CORES dos pontos
             const comparacoes = [
                 { 
                     maior: perfis[1], 
                     menor: perfis[0], 
                     titulo: "Superior passa Médio",
-                    corPonto: '#ff7f0e' // Laranja
+                    corPonto: '#ff7f0e' 
                 }, 
                 { 
                     maior: perfis[2], 
                     menor: perfis[1],
                     titulo: "Mestrado passa Superior",
-                    corPonto: '#d62728' // Vermelho
+                    corPonto: '#d62728' 
                 } 
             ];
 
@@ -433,7 +451,6 @@
                         let idadeVirada = labelsIdade[i];
                         let valorVirada = comp.maior.data[i];
 
-                        // Card HTML
                         let html = `
                             <div class="analysis-card shadow-sm" style="border-left-color: ${comp.corPonto}">
                                 <strong style="color: ${comp.corPonto}">● ${comp.titulo}</strong><br>
@@ -442,11 +459,10 @@
                             </div>`;
                         insightsContainer.innerHTML += html;
 
-                        // Adiciona configuração específica do ponto
                         points.push({ 
                             x: idadeVirada, 
                             y: valorVirada, 
-                            labelLegend: comp.titulo, // Texto que vai pra legenda
+                            labelLegend: comp.titulo, 
                             color: comp.corPonto
                         });
                         break; 
@@ -544,6 +560,7 @@
     </script>
 </body>
 </html>
+
 
 
 
