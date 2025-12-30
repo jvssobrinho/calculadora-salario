@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Salários Brasil 2025</title>
+    <title>Simulador Microeconométrico Brasil 2025</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { box-shadow: 0 8px 16px rgba(0,0,0,0.08); border: none; border-radius: 15px; }
         .header-bg { background: linear-gradient(135deg, #0d6efd, #0043a8); color: white; padding: 3rem 0; margin-bottom: 2rem; }
         
+        /* Estilos da Calculadora Instantânea */
         .result-box { 
             background-color: #ffffff; 
             border: 1px solid #dee2e6;
@@ -28,8 +33,18 @@
         .result-range { font-size: 1.15rem; color: #495057; background-color: #f8f9fa; padding: 10px; border-radius: 8px; display: inline-block; margin-top: 10px; border: 1px solid #e9ecef; }
         .badge-uf { background-color: #e7f1ff; color: #0d6efd; padding: 6px 12px; border-radius: 30px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         
+        /* Botões */
         .btn-calc { padding: 15px; font-size: 1.2rem; font-weight: 700; transition: all 0.3s; }
         .btn-calc:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3); }
+
+        /* Estilos da Aba de Navegação */
+        .nav-pills .nav-link { color: #495057; font-weight: 600; padding: 12px 25px; border-radius: 30px; margin: 0 5px; }
+        .nav-pills .nav-link.active { background-color: #0d6efd; color: white; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3); }
+        
+        /* Container do Gráfico */
+        #chart-container { position: relative; height: 500px; width: 100%; margin-top: 20px; }
+        
+        .analysis-card { background: #fff; border-left: 4px solid #6f42c1; padding: 15px; margin-bottom: 10px; border-radius: 4px; font-size: 0.95rem; }
 
         footer a { color: inherit; text-decoration: none; border-bottom: 1px dotted #6c757d; }
         footer a:hover { color: #0d6efd; border-bottom: 1px solid #0d6efd; }
@@ -38,130 +53,152 @@
 <body class="d-flex flex-column min-vh-100">
 
     <div class="header-bg text-center">
-        <h1 class="fw-bold display-5">💰 Simulador de Salários Brasil</h1>
-        <p class="lead opacity-90">Baseado em dados da PNADc 2025 (IBGE) e Microeconometria</p>
+        <h1 class="fw-bold display-5">💰 Microeconometria Aplicada</h1>
+        <p class="lead opacity-90">Simuladores baseados na PNADc 2025 e Equações de Mincer</p>
     </div>
 
     <div class="container pb-5 flex-grow-1">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-7">
-                <div class="card p-4 p-md-5">
-                    <form id="salaryForm">
-                        <div class="row g-4 mb-4">
-                            <div class="col-12">
-                                <h5 class="text-primary fw-bold border-bottom pb-2">1. Seu Perfil</h5>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-secondary">Idade</label>
-                                <input type="number" class="form-control form-control-lg" id="idade" value="30" min="14" max="80" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-secondary">Escolaridade</label>
-                                <select class="form-select form-select-lg" id="estudo">
-                                    <option value="0">Sem instrução</option>
-                                    <option value="4">Fundamental Incompleto</option>
-                                    <option value="9">Fundamental Completo</option>
-                                    <option value="12" selected>Médio Completo</option>
-                                    <option value="16">Superior Completo</option>
-                                    <option value="18">Pós-Graduação (Mestrado/Dout)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-secondary">Gênero</label>
-                                <select class="form-select form-select-lg" id="sexo">
-                                    <option value="homem">Homem</option>
-                                    <option value="mulher">Mulher</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-secondary">Cor / Raça</label>
-                                <select class="form-select form-select-lg" id="cor">
-                                    <option value="branca">Branca / Amarela / Indígena</option>
-                                    <option value="preta">Preta / Parda</option>
-                                </select>
-                            </div>
-                        </div>
+        
+        <ul class="nav nav-pills justify-content-center mb-5" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-calc-tab" data-bs-toggle="pill" data-bs-target="#pills-calc" type="button" role="tab">Calculadora Instantânea</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-sim-tab" data-bs-toggle="pill" data-bs-target="#pills-sim" type="button" role="tab">Custo de Oportunidade (Vida)</button>
+            </li>
+        </ul>
 
-                        <div class="row g-4 mb-4">
-                            <div class="col-12">
-                                <h5 class="text-primary fw-bold border-bottom pb-2 mt-3">2. Mercado de Trabalho</h5>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold text-secondary">Setor de Atividade</label>
-                                <select class="form-select form-select-lg" id="setor">
-                                    <option value="1">Agricultura, Pecuária e Silvicultura</option>
-                                    <option value="2">Indústria Extrativa</option>
-                                    <option value="3" selected>Indústria de Transformação</option>
-                                    <option value="4">Eletricidade e Gás</option>
-                                    <option value="5">Água, Esgoto e Gestão de Resíduos</option>
-                                    <option value="6">Construção Civil</option>
-                                    <option value="7">Comércio e Reparação de Veículos</option>
-                                    <option value="8">Transporte, Armazenagem e Correio</option>
-                                    <option value="9">Alojamento e Alimentação</option>
-                                    <option value="10">Informação e Comunicação (TI)</option>
-                                    <option value="11">Administração Pública e Defesa</option>
-                                    <option value="12">Educação, Saúde e Serviços Sociais</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold text-secondary">Estado (UF) para Simulação</label>
-                                <select class="form-select form-select-lg" id="uf">
-                                    <option value="11">Rondônia (RO)</option>
-                                    <option value="12">Acre (AC)</option>
-                                    <option value="13">Amazonas (AM)</option>
-                                    <option value="14">Roraima (RR)</option>
-                                    <option value="15">Pará (PA)</option>
-                                    <option value="16">Amapá (AP)</option>
-                                    <option value="17">Tocantins (TO)</option>
-                                    <option value="21">Maranhão (MA)</option>
-                                    <option value="22">Piauí (PI)</option>
-                                    <option value="23">Ceará (CE)</option>
-                                    <option value="24">Rio Grande do Norte (RN)</option>
-                                    <option value="25">Paraíba (PB)</option>
-                                    <option value="26">Pernambuco (PE)</option>
-                                    <option value="27">Alagoas (AL)</option>
-                                    <option value="28">Sergipe (SE)</option>
-                                    <option value="29">Bahia (BA)</option>
-                                    <option value="31">Minas Gerais (MG)</option>
-                                    <option value="32">Espírito Santo (ES)</option>
-                                    <option value="33">Rio de Janeiro (RJ)</option>
-                                    <option value="35" selected>São Paulo (SP)</option>
-                                    <option value="41">Paraná (PR)</option>
-                                    <option value="42">Santa Catarina (SC)</option>
-                                    <option value="43">Rio Grande do Sul (RS)</option>
-                                    <option value="50">Mato Grosso do Sul (MS)</option>
-                                    <option value="51">Mato Grosso (MT)</option>
-                                    <option value="52">Goiás (GO)</option>
-                                    <option value="53">Distrito Federal (DF)</option>
-                                </select>
+        <div class="tab-content" id="pills-tabContent">
+            
+            <div class="tab-pane fade show active" id="pills-calc" role="tabpanel">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-7">
+                        <div class="card p-4 p-md-5">
+                            <form id="salaryForm">
+                                <div class="row g-4 mb-4">
+                                    <div class="col-12"><h5 class="text-primary fw-bold border-bottom pb-2">1. Seu Perfil</h5></div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-secondary">Idade</label>
+                                        <input type="number" class="form-control form-control-lg" id="idade" value="30" min="14" max="80">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-secondary">Escolaridade</label>
+                                        <select class="form-select form-select-lg" id="estudo">
+                                            <option value="0">Sem instrução</option>
+                                            <option value="4">Fundamental Incompleto</option>
+                                            <option value="9">Fundamental Completo</option>
+                                            <option value="12" selected>Médio Completo</option>
+                                            <option value="16">Superior Completo</option>
+                                            <option value="18">Pós-Graduação</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-secondary">Gênero</label>
+                                        <select class="form-select form-select-lg" id="sexo">
+                                            <option value="homem">Homem</option>
+                                            <option value="mulher">Mulher</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-secondary">Cor / Raça</label>
+                                        <select class="form-select form-select-lg" id="cor">
+                                            <option value="branca">Branca / Amarela / Indígena</option>
+                                            <option value="preta">Preta / Parda</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row g-4 mb-4">
+                                    <div class="col-12"><h5 class="text-primary fw-bold border-bottom pb-2 mt-3">2. Mercado de Trabalho</h5></div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-secondary">Setor</label>
+                                        <select class="form-select form-select-lg" id="setor">
+                                            <option value="1">Agricultura</option>
+                                            <option value="3" selected>Indústria de Transformação</option>
+                                            <option value="6">Construção Civil</option>
+                                            <option value="7">Comércio</option>
+                                            <option value="10">TI e Informação</option>
+                                            <option value="11">Adm. Pública</option>
+                                            <option value="12">Educação e Saúde</option>
+                                            </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-secondary">Estado (UF)</label>
+                                        <select class="form-select form-select-lg" id="uf">
+                                            <option value="29">Bahia (BA)</option>
+                                            <option value="35" selected>São Paulo (SP)</option>
+                                            <option value="33">Rio de Janeiro (RJ)</option>
+                                            <option value="31">Minas Gerais (MG)</option>
+                                            <option value="53">Distrito Federal (DF)</option>
+                                            </select>
+                                    </div>
+                                </div>
+                                <div class="d-grid mt-5">
+                                    <button type="button" class="btn btn-primary btn-calc shadow" onclick="calcularSalario()">Calcular Agora</button>
+                                </div>
+                            </form>
+                            <div id="resultado" class="result-box">
+                                <span class="badge-uf" id="badgeUF">Média Estimada</span>
+                                <div class="result-value" id="valorEstimado">R$ 0,00</div>
+                                <div class="result-range">
+                                    <span>Faixa provável (95%):</span><br>
+                                    <strong id="faixaMin" class="text-dark">R$ 0,00</strong> 
+                                    <span class="text-muted mx-2">até</span> 
+                                    <strong id="faixaMax" class="text-dark">R$ 0,00</strong>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="d-grid mt-5">
-                            <button type="button" class="btn btn-primary btn-calc shadow" onclick="calcularSalario()">
-                                Calcular Estimativa
-                            </button>
-                        </div>
-                    </form>
-
-                    <div id="resultado" class="result-box">
-                        <span class="badge-uf" id="badgeUF">Média Estimada</span>
-                        <div class="result-value" id="valorEstimado">R$ 0,00</div>
-                        
-                        <div class="result-range">
-                            <span>Faixa provável (95% confiança):</span><br>
-                            <strong id="faixaMin" class="text-dark">R$ 0,00</strong> 
-                            <span class="text-muted mx-2">até</span> 
-                            <strong id="faixaMax" class="text-dark">R$ 0,00</strong>
-                        </div>
-                        
-                        <p class="mt-4 mb-0 text-muted small fst-italic">
-                            *Valores brutos mensais estimados para jornada de 40h semanais. <br>
-                            A "faixa provável" indica a variação salarial natural para este perfil devido a fatores não observáveis.
-                        </p>
                     </div>
                 </div>
             </div>
+
+            <div class="tab-pane fade" id="pills-sim" role="tabpanel">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="card p-4">
+                            <h3 class="fw-bold text-primary mb-4">📈 Análise de Custo de Oportunidade</h3>
+                            <p class="text-muted">Simule a renda acumulada dos 18 aos 65 anos comparando diferentes níveis de escolaridade para o mesmo perfil demográfico.</p>
+                            
+                            <div class="row g-3 p-3 bg-light rounded mb-4 border">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold small">Inflação Anual (%)</label>
+                                    <input type="number" id="sim_inflacao" class="form-control" value="6.0" step="0.1">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold small">UF</label>
+                                    <select class="form-select" id="sim_uf">
+                                        <option value="35" selected>São Paulo (SP)</option>
+                                        <option value="29">Bahia (BA)</option>
+                                        <option value="33">Rio de Janeiro (RJ)</option>
+                                        <option value="53">Distrito Federal (DF)</option>
+                                        <option value="31">Minas Gerais (MG)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold small">Setor</label>
+                                    <select class="form-select" id="sim_setor">
+                                        <option value="6" selected>Construção Civil</option>
+                                        <option value="3">Indústria</option>
+                                        <option value="10">TI e Informação</option>
+                                        <option value="12">Educação e Saúde</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button class="btn btn-success w-100 fw-bold" onclick="simularVida()">Gerar Gráfico</button>
+                                </div>
+                            </div>
+
+                            <div id="chart-container">
+                                <canvas id="lifeChart"></canvas>
+                            </div>
+
+                            <div id="simulation-insights" class="mt-4">
+                                </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -172,10 +209,13 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         let modelo = null;
+        let myChart = null; // Variável global para o gráfico
 
-        // IMPORTANTE: O nome do arquivo JSON deve ser exato
+        // Carregamento do JSON
         fetch('modelo_salario_coeficientes_2025_geral.json') 
             .then(response => {
                 if (!response.ok) throw new Error("Erro HTTP: " + response.status);
@@ -183,30 +223,23 @@
             })
             .then(data => {
                 modelo = data;
-                console.log("Modelo carregado com sucesso!", modelo.meta_info);
+                console.log("Modelo carregado:", modelo.meta_info);
             })
             .catch(error => {
                 console.error('Erro ao carregar JSON:', error);
-                alert('Erro: Não foi possível carregar os dados do modelo. Verifique se o arquivo JSON está na mesma pasta.');
+                alert('Erro: Modelo JSON não encontrado na pasta.');
             });
 
+        // ---------------------------------------------------------
+        // FUNÇÃO 1: CALCULADORA INSTANTÂNEA (Lógica Original)
+        // ---------------------------------------------------------
         function calcularSalario() {
-            if (!modelo) {
-                alert("Aguarde, carregando dados do modelo...");
-                return;
-            }
+            if (!modelo) { alert("Carregando modelo..."); return; }
 
             const coef = modelo.coeficientes;
-            
-            // --- CORREÇÃO DE SEGURANÇA ---
-            // Se o sigma vier do JSON com valor absurdo (erro de peso), usamos 0.65.
-            let sigma = modelo.meta_info.sigma_resid;
-            if (!sigma || sigma > 5) {
-                console.warn("Sigma do JSON suspeito (" + sigma + "). Usando valor padrão 0.65.");
-                sigma = 0.65; 
-            }
+            let sigma = modelo.meta_info.sigma_resid || 0.65;
+            if (sigma > 5) sigma = 0.65;
 
-            // 1. Coleta Inputs
             const idade = parseFloat(document.getElementById('idade').value);
             const anosEstudo = parseFloat(document.getElementById('estudo').value);
             const sexo = document.getElementById('sexo').value;
@@ -214,68 +247,223 @@
             const setor = document.getElementById('setor').value;
             const uf = document.getElementById('uf').value;
 
-            // 2. Experiência Minceriana
-            let experiencia = idade - anosEstudo - 6;
-            if (experiencia < 0) {
-                experiencia = 0; // Evita experiência negativa
-            }
+            let experiencia = Math.max(0, idade - anosEstudo - 6);
             let experiencia2 = experiencia * experiencia;
 
-            // 3. Soma dos Coeficientes (Log-Linear)
-            let score = coef['const'] || coef['Intercepto'] || 1.2;
+            let score = (coef['const'] || 1.2) +
+                        (coef['Anos_Estudo'] || 0) * anosEstudo +
+                        (coef['Experiencia'] || 0) * experiencia +
+                        (coef['Experiencia_2'] || 0) * experiencia2;
 
-            score += (coef['Anos_Estudo'] || 0) * anosEstudo;
-            score += (coef['Experiencia'] || 0) * experiencia;
-            score += (coef['Experiencia_2'] || 0) * experiencia2;
-
-            // Dummies
             if (sexo === 'mulher') score += (coef['d_mulher'] || 0);
             if (cor === 'preta') score += (coef['d_preto_pardo'] || 0);
-
-            // UF
+            
             let chaveUF = `UF_${uf}`;
             if (coef[chaveUF]) score += coef[chaveUF];
 
-            // Setor
             let chaveSetor = `setor_${setor}`;
             if (coef[chaveSetor]) score += coef[chaveSetor];
 
-            // IMR (Correção Viés de Seleção)
-            if (coef['IMR']) score += coef['IMR'] * 0.6; // Média estimada do IMR na população
+            if (coef['IMR']) score += coef['IMR'] * 0.6;
 
-            // 4. Cálculo dos Intervalos (Log Scale)
-            // Intervalo de Confiança de 95% (z ≈ 1.96)
-            let log_medio = score;
-            let log_min = score - (1.96 * sigma);
-            let log_max = score + (1.96 * sigma);
+            let salarioMedio = Math.exp(score) * 180;
+            let salarioMin = Math.exp(score - (1.96 * sigma)) * 180;
+            let salarioMax = Math.exp(score + (1.96 * sigma)) * 180;
 
-            // 5. Transformação para Reais (Exponencial)
-            // 4.5 semanas * 40 horas = 180 horas mensais
-            const horasMensais = 180; 
-            
-            let salarioMedio = Math.exp(log_medio) * horasMensais;
-            let salarioMin = Math.exp(log_min) * horasMensais;
-            let salarioMax = Math.exp(log_max) * horasMensais;
-
-            // Ajuste visual para valores muito baixos (opcional, mas evita R$ 50,00)
-            if (salarioMin < 0) salarioMin = 0;
-
-            // 6. Atualização da Interface
             const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-
             document.getElementById('valorEstimado').innerText = fmt.format(salarioMedio);
             document.getElementById('faixaMin').innerText = fmt.format(salarioMin);
             document.getElementById('faixaMax').innerText = fmt.format(salarioMax);
             
             const nomeUF = document.getElementById('uf').options[document.getElementById('uf').selectedIndex].text;
-            document.getElementById('badgeUF').innerText = `Estimativa para: ${nomeUF}`;
+            document.getElementById('badgeUF').innerText = `Estimativa: ${nomeUF}`;
 
-            // Efeito de aparecer
             const resultBox = document.getElementById('resultado');
             resultBox.style.display = 'block';
             resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-    </script>
 
+        // ---------------------------------------------------------
+        // FUNÇÃO 2: SIMULAÇÃO DE VIDA (Lógica Python portada)
+        // ---------------------------------------------------------
+        function simularVida() {
+            if (!modelo) { alert("Aguarde o carregamento do modelo."); return; }
+
+            // 1. Coleta Inputs da Aba Simulação
+            const inflacao = parseFloat(document.getElementById('sim_inflacao').value) / 100;
+            const uf = document.getElementById('sim_uf').value;
+            const setor = document.getElementById('sim_setor').value;
+            const coef = modelo.coeficientes;
+
+            // Perfis fixos para comparação (como no seu Python)
+            const perfis = [
+                { label: "Médio Completo", anos: 12, inicio: 18, color: '#440154', data: [] },
+                { label: "Superior Completo", anos: 16, inicio: 23, color: '#21918c', data: [] },
+                { label: "Mestrado/Doutorado", anos: 18, inicio: 30, color: '#5ec962', data: [] }
+            ];
+
+            const labelsIdade = [];
+            const salariosPorAno = 13;
+            
+            // 2. Loop de Simulação (18 a 65 anos)
+            for (let idade = 18; idade <= 65; idade++) {
+                labelsIdade.push(idade);
+
+                perfis.forEach(perfil => {
+                    let acumuladoAnterior = perfil.data.length > 0 ? perfil.data[perfil.data.length - 1] : 0;
+                    
+                    if (idade < perfil.inicio) {
+                        perfil.data.push(acumuladoAnterior); // Ainda não ganha, mantém acumulado (custo oportunidade)
+                    } else {
+                        // Calcula Experiência Minceriana
+                        let exp = Math.max(0, idade - perfil.anos - 6);
+                        let exp2 = exp * exp;
+
+                        // Score Log-Linear Base
+                        let score = (coef['const'] || 0) +
+                                    (coef['Anos_Estudo'] || 0) * perfil.anos +
+                                    (coef['Experiencia'] || 0) * exp +
+                                    (coef['Experiencia_2'] || 0) * exp2;
+
+                        // Controles fixos (Homem, Branco como base no exemplo Python, mas adicionando UF/Setor)
+                        if (coef[`UF_${uf}`]) score += coef[`UF_${uf}`];
+                        if (coef[`setor_${setor}`]) score += coef[`setor_${setor}`];
+                        if (coef['IMR']) score += coef['IMR'] * 0.6;
+
+                        // Salário Real Mensal
+                        let salarioReal = Math.exp(score) * 180;
+
+                        // Aplica Inflação Composta (desde os 18 anos)
+                        let anosInflacao = idade - 18;
+                        let fatorInflacao = Math.pow(1 + inflacao, anosInflacao);
+                        let salarioNominal = salarioReal * fatorInflacao;
+
+                        // Acumula
+                        let rendaAnual = salarioNominal * salariosPorAno;
+                        perfil.data.push(acumuladoAnterior + rendaAnual);
+                    }
+                });
+            }
+
+            // 3. Detecção de "Crossover" (Pontos de Virada)
+            const insightsContainer = document.getElementById('simulation-insights');
+            insightsContainer.innerHTML = '';
+            const points = []; // Para desenhar no gráfico
+
+            const comparacoes = [
+                { maior: perfis[1], menor: perfis[0] }, // Superior > Médio
+                { maior: perfis[2], menor: perfis[1] }  // Mestrado > Superior
+            ];
+
+            comparacoes.forEach(comp => {
+                // Encontra a primeira idade onde a curva maior ultrapassa a menor
+                // Ignora os primeiros anos onde ambos podem ser zero ou custos iniciais
+                for (let i = 0; i < labelsIdade.length; i++) {
+                    // Só verifica se a idade for maior que o inicio da carreira do "maior"
+                    if (labelsIdade[i] > comp.maior.inicio && comp.maior.data[i] > comp.menor.data[i]) {
+                        
+                        // Cria anotação visual e texto
+                        let idadeVirada = labelsIdade[i];
+                        let valorVirada = comp.maior.data[i];
+
+                        // Adiciona HTML
+                        let html = `
+                            <div class="analysis-card shadow-sm">
+                                <strong>✅ ${comp.maior.label} ultrapassa ${comp.menor.label}</strong><br>
+                                Idade de virada: <span class="text-primary fw-bold">${idadeVirada} anos</span><br>
+                                Patrimônio Acumulado: R$ ${(valorVirada/1000000).toFixed(2)} Milhões
+                            </div>`;
+                        insightsContainer.innerHTML += html;
+
+                        // Adiciona ponto para o gráfico
+                        points.push({ x: idadeVirada, y: valorVirada, label: `${comp.maior.label} >` });
+                        break; // Para após encontrar o primeiro ponto
+                    }
+                }
+            });
+
+            renderizarGrafico(labelsIdade, perfis, points);
+        }
+
+        // ---------------------------------------------------------
+        // FUNÇÃO 3: RENDERIZAR GRÁFICO (Chart.js)
+        // ---------------------------------------------------------
+        function renderizarGrafico(labels, datasets, points) {
+            const ctx = document.getElementById('lifeChart').getContext('2d');
+
+            if (myChart) myChart.destroy();
+
+            // Dataset das linhas
+            const chartDatasets = datasets.map(d => ({
+                label: d.label,
+                data: d.data,
+                borderColor: d.color,
+                backgroundColor: d.color,
+                borderWidth: 3,
+                pointRadius: 0, // Linha limpa
+                tension: 0.4 // Curva suave
+            }));
+
+            // Dataset dos pontos de virada (Scatter)
+            const scatterData = points.map(p => ({ x: p.x, y: p.y }));
+            if (scatterData.length > 0) {
+                chartDatasets.push({
+                    label: 'Ponto de Virada',
+                    data: scatterData,
+                    type: 'scatter',
+                    backgroundColor: 'red',
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                });
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: chartDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        title: { display: true, text: 'Acumulado de Renda Vitalícia (Nominal)', font: { size: 16 } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'Idade' },
+                            grid: { display: false }
+                        },
+                        y: {
+                            title: { display: true, text: 'Acumulado (R$)' },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000000) return 'R$ ' + (value/1000000).toFixed(1) + ' Mi';
+                                    if (value >= 1000) return 'R$ ' + (value/1000).toFixed(0) + ' k';
+                                    return value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
