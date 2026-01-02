@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Microeconométrico Brasil 2025 (Estratificado)</title>
+    <title>Simulador Microeconométrico Brasil 2025 (Completo)</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,7 +11,7 @@
     <style>
         body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { box-shadow: 0 8px 16px rgba(0,0,0,0.08); border: none; border-radius: 15px; }
-        .header-bg { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 3rem 0; margin-bottom: 2rem; }
+        .header-bg { background: linear-gradient(135deg, #0d6efd, #0043a8); color: white; padding: 3rem 0; margin-bottom: 2rem; }
         
         /* Estilos da Calculadora */
         .result-box { 
@@ -32,13 +32,23 @@
         .badge-uf { background-color: #e7f1ff; color: #0d6efd; padding: 6px 12px; border-radius: 30px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; }
         .badge-modelo { background-color: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; display: inline-block; }
 
-        /* Botões */
+        /* Estilos da Simulação (Cards de Insight) */
+        .analysis-card { 
+            background: #fff; 
+            border-left: 5px solid #6f42c1; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border-radius: 4px; 
+            font-size: 0.95rem; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Botões e Navegação */
         .btn-calc { padding: 15px; font-size: 1.2rem; font-weight: 700; transition: all 0.3s; }
         .btn-calc:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3); }
-
-        /* Navegação */
         .nav-pills .nav-link { color: #495057; font-weight: 600; padding: 12px 25px; border-radius: 30px; margin: 0 5px; }
-        .nav-pills .nav-link.active { background-color: #1e3c72; color: white; }
+        .nav-pills .nav-link.active { background-color: #0d6efd; color: white; }
         
         #chart-container { position: relative; height: 500px; width: 100%; margin-top: 20px; }
         footer a { color: inherit; text-decoration: none; border-bottom: 1px dotted #6c757d; }
@@ -47,8 +57,8 @@
 <body class="d-flex flex-column min-vh-100">
 
     <div class="header-bg text-center">
-        <h1 class="fw-bold display-5">📊 Simulador de Renda Brasil</h1>
-        <p class="lead opacity-90">Modelos Econométricos Estratificados por Raça (PNADc 2025)</p>
+        <h1 class="fw-bold display-5">💰 Microeconometria Aplicada</h1>
+        <p class="lead opacity-90">Simuladores baseados na PNADc 2025 e Equações de Mincer</p>
     </div>
 
     <div class="container pb-5 flex-grow-1">
@@ -58,7 +68,7 @@
                 <button class="nav-link active" id="pills-calc-tab" data-bs-toggle="pill" data-bs-target="#pills-calc" type="button">Calculadora Instantânea</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="pills-sim-tab" data-bs-toggle="pill" data-bs-target="#pills-sim" type="button" onclick="simularVida()">Curva de Vida (Educação)</button>
+                <button class="nav-link" id="pills-sim-tab" data-bs-toggle="pill" data-bs-target="#pills-sim" type="button" onclick="simularVida()">Custo de Oportunidade (Vida)</button>
             </li>
         </ul>
 
@@ -73,18 +83,18 @@
                                     <div class="col-12"><h5 class="text-primary fw-bold border-bottom pb-2">1. Perfil Demográfico</h5></div>
                                     
                                     <div class="col-12">
-                                        <label class="form-label fw-bold text-danger">Cor / Raça (Define o Modelo Estatístico)</label>
+                                        <label class="form-label fw-bold text-danger">Cor / Raça (Define o Modelo)</label>
                                         <select class="form-select form-select-lg border-danger" id="cor">
-                                            <option value="branca">Branca / Amarela</option>
+                                            <option value="branca">Branca</option>
+                                            <option value="amarela">Amarela (Asiática)</option>
                                             <option value="preta">Preta / Parda</option>
                                             <option value="indigena">Indígena</option>
                                         </select>
-                                        <div class="form-text">Selecionar a raça carrega coeficientes específicos de retorno salarial para este grupo.</div>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold text-secondary">Idade</label>
-                                        <input type="number" class="form-control form-control-lg" id="idade" value="28" min="14" max="80">
+                                        <input type="number" class="form-control form-control-lg" id="idade" value="30" min="14" max="80">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold text-secondary">Escolaridade</label>
@@ -110,40 +120,64 @@
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold text-secondary">Estado (UF)</label>
                                         <select class="form-select form-select-lg" id="uf">
-                                            <option value="35" selected>São Paulo (SP)</option>
-                                            <option value="29">Bahia (BA)</option>
-                                            <option value="33">Rio de Janeiro (RJ)</option>
-                                            <option value="31">Minas Gerais (MG)</option>
-                                            <option value="53">Distrito Federal (DF)</option>
-                                            <option value="43">Rio Grande do Sul (RS)</option>
+                                            <option value="11">Rondônia (RO)</option>
+                                            <option value="12">Acre (AC)</option>
                                             <option value="13">Amazonas (AM)</option>
+                                            <option value="14">Roraima (RR)</option>
+                                            <option value="15">Pará (PA)</option>
+                                            <option value="16">Amapá (AP)</option>
+                                            <option value="17">Tocantins (TO)</option>
+                                            <option value="21">Maranhão (MA)</option>
+                                            <option value="22">Piauí (PI)</option>
                                             <option value="23">Ceará (CE)</option>
+                                            <option value="24">Rio Grande do Norte (RN)</option>
+                                            <option value="25">Paraíba (PB)</option>
                                             <option value="26">Pernambuco (PE)</option>
-                                            </select>
+                                            <option value="27">Alagoas (AL)</option>
+                                            <option value="28">Sergipe (SE)</option>
+                                            <option value="29">Bahia (BA)</option>
+                                            <option value="31">Minas Gerais (MG)</option>
+                                            <option value="32">Espírito Santo (ES)</option>
+                                            <option value="33">Rio de Janeiro (RJ)</option>
+                                            <option value="35" selected>São Paulo (SP)</option>
+                                            <option value="41">Paraná (PR)</option>
+                                            <option value="42">Santa Catarina (SC)</option>
+                                            <option value="43">Rio Grande do Sul (RS)</option>
+                                            <option value="50">Mato Grosso do Sul (MS)</option>
+                                            <option value="51">Mato Grosso (MT)</option>
+                                            <option value="52">Goiás (GO)</option>
+                                            <option value="53">Distrito Federal (DF)</option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold text-secondary">Setor</label>
                                         <select class="form-select form-select-lg" id="setor">
-                                            <option value="3">Indústria</option>
+                                            <option value="1">Agricultura/Pecuária</option>
+                                            <option value="2">Indústria Extrativa</option>
+                                            <option value="3" selected>Indústria Transformação</option>
+                                            <option value="4">Eletricidade e Gás</option>
+                                            <option value="5">Água/Esgoto/Resíduos</option>
                                             <option value="6">Construção Civil</option>
-                                            <option value="7" selected>Comércio</option>
-                                            <option value="8">Transportes</option>
+                                            <option value="7">Comércio</option>
+                                            <option value="8">Transporte/Correio</option>
+                                            <option value="9">Alojamento/Alimentação</option>
+                                            <option value="10">Informação/Comunicação</option>
                                             <option value="11">Adm. Pública</option>
-                                            <option value="12">Educação e Saúde</option>
+                                            <option value="12">Educação/Saúde/Sociais</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="d-grid mt-4">
-                                    <button type="button" class="btn btn-primary btn-calc shadow" onclick="calcularSalario()">Calcular Renda Estimada</button>
+                                    <button type="button" class="btn btn-primary btn-calc shadow" onclick="calcularSalario()">Calcular Agora</button>
                                 </div>
                             </form>
 
                             <div id="resultado" class="result-box">
-                                <span class="badge-modelo" id="infoModelo">Carregando...</span><br>
+                                <span class="badge-modelo" id="infoModelo">...</span><br>
                                 <span class="badge-uf" id="badgeUF">Média Estimada</span>
                                 <div class="result-value" id="valorEstimado">R$ 0,00</div>
                                 <div class="text-muted small">
-                                    Faixa provável (95% confiança): <strong id="faixaMin">R$ 0</strong> até <strong id="faixaMax">R$ 0</strong>
+                                    Faixa provável (95%): <strong id="faixaMin">R$ 0</strong> a <strong id="faixaMax">R$ 0</strong>
                                 </div>
                             </div>
                         </div>
@@ -155,31 +189,45 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
                         <div class="card p-4">
-                            <h4 class="mb-3">Trajetória de Renda Vitalícia</h4>
-                            <p class="text-muted">Compare o impacto financeiro de diferentes níveis de escolaridade ao longo da vida para o perfil selecionado.</p>
+                            <h4 class="mb-3">Custo de Oportunidade e Pontos de Virada</h4>
+                            <p class="text-muted">Análise comparativa de renda vitalícia baseada no modelo estratificado selecionado.</p>
                             
                             <div class="row g-3 p-3 bg-light rounded mb-4 border align-items-end">
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold small text-danger">Modelo Racial</label>
-                                    <select class="form-select border-danger" id="sim_cor" onchange="simularVida()">
-                                        <option value="branca">Branca / Amarela</option>
+                                    <select class="form-select border-danger" id="sim_cor">
+                                        <option value="branca">Branca</option>
+                                        <option value="amarela">Amarela</option>
                                         <option value="preta">Preta / Parda</option>
                                         <option value="indigena">Indígena</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold small">Inflação Anual (%)</label>
+                                    <label class="form-label fw-bold small">Estado Base</label>
+                                    <select class="form-select" id="sim_uf">
+                                        <option value="35">São Paulo (SP)</option>
+                                        <option value="29">Bahia (BA)</option>
+                                        <option value="33">Rio de Janeiro (RJ)</option>
+                                        <option value="31">Minas Gerais (MG)</option>
+                                        <option value="53">Distrito Federal (DF)</option>
+                                        <option value="13">Amazonas (AM)</option>
+                                        <option value="43">Rio Grande do Sul (RS)</option>
+                                        </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold small">Inflação (%)</label>
                                     <input type="number" id="sim_inflacao" class="form-control" value="5.5" step="0.5">
                                 </div>
                                 <div class="col-md-3">
-                                    <button class="btn btn-success w-100 fw-bold shadow-sm" onclick="simularVida()">Atualizar Gráfico</button>
+                                    <button class="btn btn-success w-100 fw-bold shadow-sm" onclick="simularVida()">Gerar Análise</button>
                                 </div>
                             </div>
 
                             <div id="chart-container">
                                 <canvas id="lifeChart"></canvas>
                             </div>
-                            <div id="insights" class="mt-3 alert alert-secondary text-center small">Selecione o grupo acima para gerar insights.</div>
+                            
+                            <div id="simulation-insights" class="mt-4"></div>
                         </div>
                     </div>
                 </div>
@@ -213,11 +261,12 @@
             })
             .catch(err => alert("Erro ao carregar modelo: " + err.message));
 
-        // 2. FUNÇÃO CALCULAR (MODIFICADA PARA JSON ESTRATIFICADO)
+        // ---------------------------------------------------------
+        // FUNÇÃO 2: CALCULADORA (Aba 1)
+        // ---------------------------------------------------------
         function calcularSalario() {
             if (!dadosJSON) return alert("Aguarde o carregamento dos dados...");
 
-            // Inputs
             const raca = document.getElementById('cor').value;
             const idade = parseFloat(document.getElementById('idade').value);
             const anosEstudo = parseFloat(document.getElementById('estudo').value);
@@ -225,146 +274,215 @@
             const uf = document.getElementById('uf').value;
             const setor = document.getElementById('setor').value;
 
-            // --- SELEÇÃO DO SUB-MODELO ---
             const modeloAtual = dadosJSON[raca];
-            
-            if (!modeloAtual) {
-                return alert("Erro: Não há dados no JSON para o grupo " + raca);
-            }
+            if (!modeloAtual) return alert("Erro: Dados não encontrados para " + raca);
 
             const coef = modeloAtual.coeficientes;
             const meta = modeloAtual.meta_info;
 
-            // Variáveis
             let experiencia = Math.max(0, idade - anosEstudo - 6);
             let experiencia2 = experiencia * experiencia;
 
-            // Cálculo Score
-            let score = coef['const']; // Intercepto específico da raça
+            let score = coef['const']; 
 
             if(coef['Anos_Estudo']) score += coef['Anos_Estudo'] * anosEstudo;
             if(coef['Experiencia']) score += coef['Experiencia'] * experiencia;
             if(coef['Experiencia_2']) score += coef['Experiencia_2'] * experiencia2;
             
-            // Dummies
             if (sexo === 'mulher' && coef['d_mulher']) score += coef['d_mulher'];
-            
-            // Nota: NÃO ADICIONAMOS MAIS 'd_preto_pardo' MANUALMENTE
-            // Pois o modelo 'preta' ou 'indigena' já tem seus próprios coeficientes.
-
             if (coef[`UF_${uf}`]) score += coef[`UF_${uf}`];
             if (coef[`setor_${setor}`]) score += coef[`setor_${setor}`];
 
-            if (coef['IMR']) score += coef['IMR'] * 0.6; // Correção Heckman
+            if (coef['IMR']) score += coef['IMR'] * 0.6; 
 
-            // Resultados
-            let salarioMedio = Math.exp(score) * 180; // Mensal (aprox 180h)
-            
+            let salarioMedio = Math.exp(score) * 180; 
             let sigma = meta.sigma_resid || 0.65;
             let min = Math.exp(score - 1.96 * sigma) * 180;
             let max = Math.exp(score + 1.96 * sigma) * 180;
 
-            // Formatação
             const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
             
             document.getElementById('valorEstimado').innerText = fmt.format(salarioMedio);
             document.getElementById('faixaMin').innerText = fmt.format(min);
             document.getElementById('faixaMax').innerText = fmt.format(max);
             
-            const nomes = { 'branca': 'População Branca/Amarela', 'preta': 'População Preta/Parda', 'indigena': 'População Indígena' };
+            const nomes = { 'branca': 'Branca', 'amarela': 'Amarela', 'preta': 'Preta/Parda', 'indigena': 'Indígena' };
             document.getElementById('infoModelo').innerText = `Modelo Aplicado: ${nomes[raca]}`;
+            const nomeUF = document.getElementById('uf').options[document.getElementById('uf').selectedIndex].text;
+            document.getElementById('badgeUF').innerText = nomeUF;
             
             const box = document.getElementById('resultado');
             box.style.display = 'block';
             box.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 3. SIMULAÇÃO DE VIDA
+        // ---------------------------------------------------------
+        // FUNÇÃO 3: SIMULAÇÃO DE VIDA COMPLEXA (Aba 2)
+        // ---------------------------------------------------------
         function simularVida() {
             if (!dadosJSON) return;
 
             const raca = document.getElementById('sim_cor').value;
             const inflacao = parseFloat(document.getElementById('sim_inflacao').value) / 100;
+            const uf = document.getElementById('sim_uf').value; // Agora pega do select
+            // Fixando setor médio (Comércio) e Gênero (Homem) para isolar efeito educação
+            const setor = "7"; 
+            
             const modeloAtual = dadosJSON[raca];
             const coef = modeloAtual.coeficientes;
 
-            // Cenários
-            const cenarios = [
-                { label: "Médio (12 anos)", anos: 12, inicio: 18, cor: '#ffc107' },
-                { label: "Superior (16 anos)", anos: 16, inicio: 22, cor: '#0d6efd' },
-                { label: "Mestrado (18 anos)", anos: 18, inicio: 24, cor: '#198754' }
+            // Perfis de Estudo
+            const perfis = [
+                { label: "Médio (12 anos)", anos: 12, inicio: 18, color: '#ffc107', data: [] },
+                { label: "Superior (16 anos)", anos: 16, inicio: 23, color: '#0d6efd', data: [] }, // Começa a trabalhar com 23
+                { label: "Mestrado (18 anos)", anos: 18, inicio: 25, color: '#198754', data: [] }
             ];
 
-            const labels = [];
-            const datasets = [];
+            const labelsIdade = [];
+            const salariosPorAno = 13; // 12 meses + 13º
 
-            cenarios.forEach(c => {
-                datasets.push({
-                    label: c.label,
-                    data: [],
-                    borderColor: c.cor,
-                    backgroundColor: c.cor,
-                    tension: 0.4
-                });
-            });
+            // 1. Loop de Cálculo (18 a 65 anos)
+            for (let idade = 18; idade <= 65; idade++) {
+                labelsIdade.push(idade);
 
-            // Loop 18 a 65 anos
-            for (let t = 18; t <= 65; t++) {
-                labels.push(t);
-                
-                cenarios.forEach((c, idx) => {
-                    if (t < c.inicio) {
-                        datasets[idx].data.push(null);
+                perfis.forEach(perfil => {
+                    // Pega valor acumulado do ano anterior (ou 0 se for o primeiro)
+                    let acumuladoAnterior = perfil.data.length > 0 ? perfil.data[perfil.data.length - 1] : 0;
+                    
+                    // Se idade < inicio da carreira, a pessoa não ganha nada (Custo de Oportunidade)
+                    if (idade < perfil.inicio) {
+                        perfil.data.push(acumuladoAnterior); 
                     } else {
-                        let exp = t - c.anos - 6;
+                        let exp = idade - perfil.anos - 6;
+                        if (exp < 0) exp = 0;
                         let exp2 = exp * exp;
-                        
+
+                        // Score Base
                         let s = coef['const'];
-                        s += coef['Anos_Estudo'] * c.anos;
+                        s += coef['Anos_Estudo'] * perfil.anos;
                         s += coef['Experiencia'] * exp;
                         s += coef['Experiencia_2'] * exp2;
-                        
-                        // Fixando variáveis médias para o gráfico
-                        if(coef['UF_35']) s += coef['UF_35']; // SP
-                        if(coef['setor_7']) s += coef['setor_7']; // Comércio
 
-                        let real = Math.exp(s) * 180;
-                        let nominal = real * Math.pow(1 + inflacao, (t - 18));
+                        // Controles Fixos para a Simulação
+                        if (coef[`UF_${uf}`]) s += coef[`UF_${uf}`];
+                        if (coef[`setor_${setor}`]) s += coef[`setor_${setor}`];
+
+                        let salarioReal = Math.exp(s) * 180;
                         
-                        datasets[idx].data.push(nominal);
+                        // Inflação acumulada desde os 18 anos
+                        let fatorInflacao = Math.pow(1 + inflacao, (idade - 18));
+                        let salarioNominal = salarioReal * fatorInflacao;
+
+                        let rendaAnual = salarioNominal * salariosPorAno;
+                        perfil.data.push(acumuladoAnterior + rendaAnual);
                     }
                 });
             }
 
-            // Renderizar Gráfico
-            const ctx = document.getElementById('lifeChart').getContext('2d');
-            if (myChart) myChart.destroy();
+            // 2. Lógica de Pontos de Virada (Cruzamento das curvas)
+            const insightsContainer = document.getElementById('simulation-insights');
+            insightsContainer.innerHTML = ''; // Limpa anterior
+            const points = []; 
 
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels, datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        title: { display: true, text: `Projeção Salarial Nominal - ${raca.toUpperCase()}` },
-                        tooltip: { callbacks: { label: (c) => `R$ ${c.raw.toFixed(0)}` } }
-                    },
-                    scales: { y: { title: {display:true, text:'Renda Mensal (R$)'} } }
+            const comparacoes = [
+                { maior: perfis[1], menor: perfis[0], titulo: "Superior ultrapassa Médio", corPonto: '#ff7f0e' }, 
+                { maior: perfis[2], menor: perfis[1], titulo: "Mestrado ultrapassa Superior", corPonto: '#d62728' } 
+            ];
+
+            comparacoes.forEach(comp => {
+                for (let i = 0; i < labelsIdade.length; i++) {
+                    // Se já começou a trabalhar E acumulado maior ultrapassou menor
+                    if (labelsIdade[i] > comp.maior.inicio && comp.maior.data[i] > comp.menor.data[i]) {
+                        
+                        let idadeVirada = labelsIdade[i];
+                        let valorVirada = comp.maior.data[i];
+
+                        let html = `
+                            <div class="analysis-card" style="border-left-color: ${comp.corPonto}">
+                                <strong style="color: ${comp.corPonto}">● ${comp.titulo}</strong><br>
+                                Idade de Virada: <b>${idadeVirada} anos</b><br>
+                                Patrimônio Acumulado (Salários): R$ ${(valorVirada/1000000).toFixed(2)} Milhões
+                            </div>`;
+                        insightsContainer.innerHTML += html;
+
+                        points.push({ 
+                            x: idadeVirada, 
+                            y: valorVirada, 
+                            labelLegend: comp.titulo, 
+                            color: comp.corPonto
+                        });
+                        break; // Para de procurar após achar o ponto de cruzamento
+                    }
                 }
             });
 
-            // Insights
-            const fimSup = datasets[1].data.at(-1);
-            const fimMed = datasets[0].data.at(-1);
-            const premio = ((fimSup/fimMed) - 1) * 100;
-            
-            document.getElementById('insights').innerHTML = `
-                <strong>Insight Automático:</strong> Para o grupo <span class='text-uppercase'>${raca}</span>, 
-                o Ensino Superior projeta um salário final <strong>${premio.toFixed(1)}% maior</strong> 
-                que o Ensino Médio aos 65 anos.
-            `;
+            renderizarGrafico(labelsIdade, perfis, points, raca);
+        }
+
+        // ---------------------------------------------------------
+        // FUNÇÃO 4: RENDERIZAR GRÁFICO CUSTOMIZADO (Linhas + Pontos)
+        // ---------------------------------------------------------
+        function renderizarGrafico(labels, datasets, points, raca) {
+            const ctx = document.getElementById('lifeChart').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            // Dataset das Linhas
+            const chartDatasets = datasets.map(d => ({
+                label: d.label,
+                data: d.data,
+                borderColor: d.color,
+                backgroundColor: d.color,
+                borderWidth: 3,
+                pointRadius: 0,
+                tension: 0.4
+            }));
+
+            // Dataset dos Pontos de Virada (Scatter)
+            points.forEach(p => {
+                chartDatasets.push({
+                    label: p.labelLegend,
+                    data: [{x: p.x, y: p.y}],
+                    type: 'scatter',
+                    backgroundColor: p.color,
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    order: 0 
+                });
+            });
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: chartDatasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false },
+                    plugins: {
+                        title: { display: true, text: `Acumulado de Renda (Nominal) - ${raca.toUpperCase()}`, font: { size: 16 } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    let val = context.raw;
+                                    if (typeof val === 'object') val = val.y; // Se for scatter
+                                    if (val >= 1e6) return label + 'R$ ' + (val/1e6).toFixed(2) + ' Mi';
+                                    return label + 'R$ ' + (val/1e3).toFixed(0) + ' k';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Idade' } },
+                        y: { 
+                            title: { display: true, text: 'Acumulado (R$)' },
+                            ticks: { callback: (val) => 'R$ ' + (val/1e6).toFixed(1) + ' Mi' }
+                        }
+                    }
+                }
+            });
         }
     </script>
 </body>
