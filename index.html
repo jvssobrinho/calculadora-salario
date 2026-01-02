@@ -263,58 +263,69 @@
 
         // ---------------------------------------------------------
         // FUNÇÃO 2: CALCULADORA (Aba 1)
-        // ---------------------------------------------------------
-        function calcularSalario() {
-            if (!dadosJSON) return alert("Aguarde o carregamento dos dados...");
 
-            const raca = document.getElementById('cor').value;
-            const idade = parseFloat(document.getElementById('idade').value);
-            const anosEstudo = parseFloat(document.getElementById('estudo').value);
-            const sexo = document.getElementById('sexo').value;
-            const uf = document.getElementById('uf').value;
-            const setor = document.getElementById('setor').value;
+function calcularSalario() {
+    if (!dadosJSON) return alert("Aguarde o carregamento dos dados...");
 
-            const modeloAtual = dadosJSON[raca];
-            if (!modeloAtual) return alert("Erro: Dados não encontrados para " + raca);
+    const raca = document.getElementById('cor').value;
+    const idade = parseFloat(document.getElementById('idade').value);
+    const anosEstudo = parseFloat(document.getElementById('estudo').value);
+    const sexo = document.getElementById('sexo').value;
+    const uf = document.getElementById('uf').value;
+    const setor = document.getElementById('setor').value;
 
-            const coef = modeloAtual.coeficientes;
-            const meta = modeloAtual.meta_info;
+    const modeloAtual = dadosJSON[raca];
+    if (!modeloAtual) return alert("Erro: Dados não encontrados para " + raca);
 
-            let experiencia = Math.max(0, idade - anosEstudo - 6);
-            let experiencia2 = experiencia * experiencia;
+    const coef = modeloAtual.coeficientes;
+    const meta = modeloAtual.meta_info;
 
-            let score = coef['const']; 
+    let experiencia = Math.max(0, idade - anosEstudo - 6);
+    let experiencia2 = experiencia * experiencia;
 
-            if(coef['Anos_Estudo']) score += coef['Anos_Estudo'] * anosEstudo;
-            if(coef['Experiencia']) score += coef['Experiencia'] * experiencia;
-            if(coef['Experiencia_2']) score += coef['Experiencia_2'] * experiencia2;
-            
-            if (sexo === 'mulher' && coef['d_mulher']) score += coef['d_mulher'];
-            if (coef[`UF_${uf}`]) score += coef[`UF_${uf}`];
-            if (coef[`setor_${setor}`]) score += coef[`setor_${setor}`];
+    let score = coef['const']; 
 
-            if (coef['IMR']) score += coef['IMR'] * 0.6; 
+    if(coef['Anos_Estudo']) score += coef['Anos_Estudo'] * anosEstudo;
+    if(coef['Experiencia']) score += coef['Experiencia'] * experiencia;
+    if(coef['Experiencia_2']) score += coef['Experiencia_2'] * experiencia2;
+    
+    if (sexo === 'mulher' && coef['d_mulher']) score += coef['d_mulher'];
+    if (coef[`UF_${uf}`]) score += coef[`UF_${uf}`];
+    if (coef[`setor_${setor}`]) score += coef[`setor_${setor}`];
 
-            let salarioMedio = Math.exp(score) * 180; 
-            let sigma = meta.sigma_resid || 0.65;
-            let min = Math.exp(score - 1.96 * sigma) * 180;
-            let max = Math.exp(score + 1.96 * sigma) * 180;
+    if (coef['IMR']) score += coef['IMR'] * 0.6; 
 
-            const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-            
-            document.getElementById('valorEstimado').innerText = fmt.format(salarioMedio);
-            document.getElementById('faixaMin').innerText = fmt.format(min);
-            document.getElementById('faixaMax').innerText = fmt.format(max);
-            
-            const nomes = { 'branca': 'Branca', 'amarela': 'Amarela', 'preta': 'Preta/Parda', 'indigena': 'Indígena' };
-            document.getElementById('infoModelo').innerText = `Modelo Aplicado: ${nomes[raca]}`;
-            const nomeUF = document.getElementById('uf').options[document.getElementById('uf').selectedIndex].text;
-            document.getElementById('badgeUF').innerText = nomeUF;
-            
-            const box = document.getElementById('resultado');
-            box.style.display = 'block';
-            box.scrollIntoView({ behavior: 'smooth' });
-        }
+    let salarioMedio = Math.exp(score) * 180; 
+    
+    // --- CORREÇÃO AQUI ---
+    let sigma = meta.sigma_resid || 0.65;
+    if (sigma > 2.0) {
+        console.warn("Sigma muito alto detectado (" + sigma + "). Ajustando para 0.65.");
+        sigma = 0.65;
+    }
+    // ---------------------
+
+    let min = Math.exp(score - 1.96 * sigma) * 180;
+    let max = Math.exp(score + 1.96 * sigma) * 180;
+
+    const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+    
+    document.getElementById('valorEstimado').innerText = fmt.format(salarioMedio);
+    document.getElementById('faixaMin').innerText = fmt.format(min);
+    document.getElementById('faixaMax').innerText = fmt.format(max);
+    
+    const nomes = { 'branca': 'Branca', 'amarela': 'Amarela', 'preta': 'Preta/Parda', 'indigena': 'Indígena' };
+    document.getElementById('infoModelo').innerText = `Modelo Aplicado: ${nomes[raca]}`;
+    
+    // Atualiza nome da UF no Badge
+    const selUF = document.getElementById('uf');
+    const nomeUF = selUF.options[selUF.selectedIndex].text;
+    document.getElementById('badgeUF').innerText = nomeUF;
+    
+    const box = document.getElementById('resultado');
+    box.style.display = 'block';
+    box.scrollIntoView({ behavior: 'smooth' });
+}
 
         // ---------------------------------------------------------
         // FUNÇÃO 3: SIMULAÇÃO DE VIDA COMPLEXA (Aba 2)
@@ -487,3 +498,4 @@
     </script>
 </body>
 </html>
+
